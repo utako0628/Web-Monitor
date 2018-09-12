@@ -1,10 +1,7 @@
 from django.shortcuts import render, render_to_response, redirect
-from django.http import HttpResponse
 from django import forms
 from .models import User
-from .videoCamera import gen, VideoCamera
-from django.http import HttpResponseRedirect, HttpResponse, StreamingHttpResponse, HttpResponseServerError
-from django.views.decorators import gzip
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseServerError
 from . import models
 from . forms import user_form
 from . forms import change_form
@@ -23,13 +20,20 @@ def index(request):
         return render(request, 'web/index.html')
 
 def login_page(request):
-    return render(request, 'web/login_page.html', { 'f1': user_form() })
+    user_cookie = request.COOKIES.get('username', '')
+    if user_cookie:
+        return HttpResponseRedirect('/monitor/')
+    else:
+        return render(request, 'web/login_page.html', { 'f1': user_form() })
 
 def change_password_page(request):
     return render(request, 'web/change_password_page.html', { 'f1': change_form() })
 
 
 def login(request):
+    user_cookie = request.COOKIES.get('username', '')
+    if user_cookie:
+        return HttpResponseRedirect('/monitor/')
     if request.method == 'POST':
         f1 = user_form(request.POST)
         if f1.is_valid():
@@ -69,10 +73,10 @@ def change_password(request):
                     message = '原密码不正确，请重新输入'
             else:
                 message = '用户不存在'
-            return render(request, 'change_password_page.html', { 'f1': f1, 'message': message })
+            return render(request, 'web/change_password_page.html', { 'f1': f1, 'message': message })
 
     f1 = change_form()
-    return render(request,'change_password_page.html', { 'f1': f1 })
+    return render(request,'web/change_password_page.html', { 'f1': f1 })
 
 def logout(request):
     if request.COOKIES['username']:

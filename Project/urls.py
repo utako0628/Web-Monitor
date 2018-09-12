@@ -19,11 +19,6 @@ from web import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('index/', views.index),
-    path('index/login_page/', views.login_page, name='login_page'),
-    path('index/login/', views.login, name='login'),
-    path('index/change_password_page/', views.change_password_page, name='change_password_page'),
-    path('index/change_password/', views.change_password, name='change_password'),
-    path('index/logout/', views.logout, name='logout')
-    path('monitor/', include('monitor.urls'))
+    path('monitor/', include('monitor.urls')),
+    path('web/',include('web.urls'))
 ]

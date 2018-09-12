@@ -1,22 +1,18 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, StreamingHttpResponse
-from ..MobileNetSSD.videoCamera import gen, VideoCamera
+from .MobileNetSSD.videoCamera import gen, VideoCamera
 from django.views.decorators import gzip
 
 # Create your views here.
 def index(request):
     user_cookie = request.COOKIES.get('username', '')
     if user_cookie:
-        try:
-            return render(request, 'monitor/index.html', { 'username': user_cookie })
-        except:
-            return HttpResponseRedirect('/web/index/')
+        return render(request, 'monitor/index.html', { 'username': user_cookie })
     else:
-        return HttpResponseRedirect('/web/index/')
+        return HttpResponseRedirect('/web/')
 
 def start(request):
     global vc
-    print(os.getcwd())
     vc = VideoCamera('./monitor/MobileNetSSD/deploy.prototxt', './monitor/MobileNetSSD/MobileNetSSD_deploy.caffemodel')
     return HttpResponse()
 

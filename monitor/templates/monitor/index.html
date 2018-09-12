@@ -5,7 +5,7 @@
     </head>
     <body style="margin: 0px;">
         <h3> Hello, {{ username }} </h3>
-        <form action="{% url 'logout' %}" method="POST">
+        <form action="{% url 'web:logout' %}" method="POST">
             {% csrf_token %}
             <input type="submit" value="Logout">
         </form>
@@ -26,12 +26,12 @@
         $('#start').submit(function(e){
             e.preventDefault();
             $.ajax({
-                url:"{% url 'start'%}",
+                url:"{% url 'monitor:start'%}",
                 type:'post',
                 data:$('#start').serialize(),
                 success: function(){
                     $('#camera_view').show();
-                    $('#camera_view').attr('src',"{% url 'stream' %}");
+                    $('#camera_view').attr('src',"{% url 'monitor:stream' %}");
                 }
             });
         });
@@ -39,7 +39,7 @@
         $('#stop').submit(function(e){
             e.preventDefault();
             $.ajax({
-                url:"{% url 'stop'%}",
+                url:"{% url 'monitor:stop'%}",
                 type:'post',
                 data:$('#stop').serialize(),
                 success: function(){
