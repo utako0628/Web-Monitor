@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django import forms
 from web.models import User
 from web.videoCamera import gen, VideoCamera
-from django.http import HttpResponse, StreamingHttpResponse, HttpResponseServerError
+from django.http import HttpResponseRedirect, HttpResponse, StreamingHttpResponse, HttpResponseServerError
 from django.views.decorators import gzip
 from . import models
 from . forms import user_form
@@ -12,10 +12,32 @@ from . forms import change_form
 # Create your views here.
 
 def index(request):
-    return render(request, 'index.html')
+    user_cookie = request.COOKIES.get('username', '')
+    if user_cookie:
+        try:
+            user = models.User.objects.get(name=user_cookie)
+            return HttpResponseRedirect('/index/show/')
+        except:
+            return render(request, 'index.html')
+    else:
+        return render(request, 'index.html')
+
+def login_page(request):
+    return render(request, 'login_page.html', { 'f1': user_form() })
+
+def change_password_page(request):
+    return render(request, 'change_password_page.html', { 'f1': change_form() })
 
 def show(request):
-    return render(request, 'show.html')
+    user_cookie = request.COOKIES.get('username', '')
+    if user_cookie:
+        try:
+            user = models.User.objects.get(name=user_cookie)
+            return render(request, 'show.html', { 'username': user_cookie })
+        except:
+            return HttpResponseRedirect('/index/')
+    else:
+        return HttpResponseRedirect('/index/')
 
 def start(request):
     global vc
@@ -44,18 +66,20 @@ def login(request):
                 user = models.User.objects.get(name=username)
                 if user.password == password:
                     #return redirect('/index/')
-                    #return render_to_response('http://127.0.0.1:8000/index/show')
-                    return redirect('http://127.0.0.1:8000/index/show')
+                    #return render_to_response('http://127.0.0.1:8000/index/show') 
+                    response =  HttpResponseRedirect('/index/show/')
+                    response.set_cookie('username', username, max_age=600)
+                    return response
                     #return render(request, '/index/show')
                 else:
                     message = '密码不正确，请重新输入'
             except:
                 message = '用户不存在'
-        return render(request, 'login.html', locals())
+        return render(request, 'login_page.html', { 'f1': f1, 'message': message })
     f1 = user_form()
-    return render(request, 'login.html', locals())
+    return render(request, 'login_page.html', { 'f1': f1 })
 
-def changepassword(request):
+def change_password(request):
     if request.method == 'POST':
         f1 = change_form(request.POST)
         if f1.is_valid():
@@ -72,7 +96,13 @@ def changepassword(request):
                     message = '原密码不正确，请重新输入'
             else:
                 message = '用户不存在'
-            return render(request, 'changepassword.html', locals())
+            return render(request, 'change_password_page.html', { 'f1': f1, 'message': message })
 
     f1 = change_form()
-    return render(request,'changepassword.html', locals())
+    return render(request,'change_password_page.html', { 'f1': f1 })
+
+def logout(request):
+    if request.COOKIES['username']:
+        response = HttpResponseRedirect('/index/')
+        response.delete_cookie('username')
+        return response

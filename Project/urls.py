@@ -20,10 +20,13 @@ from web import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('index/', views.index),
-    path('index/login.html', views.login),
-    path('index/changepassword.html', views.changepassword),
-    path('index/show', views.show),
-    path('index/show/start', views.start, name='start'),
-    path('index/show/stop', views.stop, name='stop'),
-    path('index/show/stream', views.stream, name='stream')
+    path('index/login_page/', views.login_page, name='login_page'),
+    path('index/login/', views.login, name='login'),
+    path('index/change_password_page/', views.change_password_page, name='change_password_page'),
+    path('index/change_password/', views.change_password, name='change_password'),
+    path('index/show/', views.show, name='show'),
+    path('index/show/start/', views.start, name='start'),
+    path('index/show/stop/', views.stop, name='stop'),
+    path('index/show/stream/', views.stream, name='stream'),
+    path('index/logout/', views.logout, name='logout')
 ]
