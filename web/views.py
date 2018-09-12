@@ -1,8 +1,8 @@
 from django.shortcuts import render, render_to_response, redirect
 from django.http import HttpResponse
 from django import forms
-from web.models import User
-from web.videoCamera import gen, VideoCamera
+from .models import User
+from .videoCamera import gen, VideoCamera
 from django.http import HttpResponseRedirect, HttpResponse, StreamingHttpResponse, HttpResponseServerError
 from django.views.decorators import gzip
 from . import models
@@ -16,45 +16,18 @@ def index(request):
     if user_cookie:
         try:
             user = models.User.objects.get(name=user_cookie)
-            return HttpResponseRedirect('/index/show/')
+            return HttpResponseRedirect('/monitor/')
         except:
-            return render(request, 'index.html')
+            return render(request, 'web/index.html')
     else:
-        return render(request, 'index.html')
+        return render(request, 'web/index.html')
 
 def login_page(request):
-    return render(request, 'login_page.html', { 'f1': user_form() })
+    return render(request, 'web/login_page.html', { 'f1': user_form() })
 
 def change_password_page(request):
-    return render(request, 'change_password_page.html', { 'f1': change_form() })
+    return render(request, 'web/change_password_page.html', { 'f1': change_form() })
 
-def show(request):
-    user_cookie = request.COOKIES.get('username', '')
-    if user_cookie:
-        try:
-            user = models.User.objects.get(name=user_cookie)
-            return render(request, 'show.html', { 'username': user_cookie })
-        except:
-            return HttpResponseRedirect('/index/')
-    else:
-        return HttpResponseRedirect('/index/')
-
-def start(request):
-    global vc
-    vc = VideoCamera('web/deploy.prototxt', 'web/MobileNetSSD_deploy.caffemodel')
-    return HttpResponse()
-
-def stop(request):
-    global vc
-    del vc
-    return HttpResponse()
-
-def stream(request):
-    global vc
-    try:
-        return StreamingHttpResponse(gen(vc),content_type="multipart/x-mixed-replace;boundary=frame")
-    except HttpResponseServerError as e:
-        print("aborted")
 
 def login(request):
     if request.method == 'POST':
@@ -67,7 +40,7 @@ def login(request):
                 if user.password == password:
                     #return redirect('/index/')
                     #return render_to_response('http://127.0.0.1:8000/index/show') 
-                    response =  HttpResponseRedirect('/index/show/')
+                    response =  HttpResponseRedirect('/monitor/')
                     response.set_cookie('username', username, max_age=600)
                     return response
                     #return render(request, '/index/show')
@@ -75,9 +48,9 @@ def login(request):
                     message = '密码不正确，请重新输入'
             except:
                 message = '用户不存在'
-        return render(request, 'login_page.html', { 'f1': f1, 'message': message })
+        return render(request, 'web/login_page.html', { 'f1': f1, 'message': message })
     f1 = user_form()
-    return render(request, 'login_page.html', { 'f1': f1 })
+    return render(request, 'web/login_page.html', { 'f1': f1 })
 
 def change_password(request):
     if request.method == 'POST':
@@ -91,7 +64,7 @@ def change_password(request):
                 pw = User.objects.filter(name=username, password=old_password)
                 if pw:
                     User.objects.filter(name=username, password=old_password).update(password=new_password)
-                    return redirect('/index/')
+                    return redirect('/web/')
                 else:
                     message = '原密码不正确，请重新输入'
             else:
@@ -103,6 +76,6 @@ def change_password(request):
 
 def logout(request):
     if request.COOKIES['username']:
-        response = HttpResponseRedirect('/index/')
+        response = HttpResponseRedirect('/web/')
         response.delete_cookie('username')
         return response
