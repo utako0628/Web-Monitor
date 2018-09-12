@@ -15,12 +15,24 @@ def index(request):
     return render(request, 'index.html')
 
 def show(request):
+    return render(request, 'show.html')
+
+def start(request):
+    global vc
+    vc = VideoCamera('web/deploy.prototxt', 'web/MobileNetSSD_deploy.caffemodel')
+    return HttpResponse()
+
+def stop(request):
+    global vc
+    del vc
+    return HttpResponse()
+
+def stream(request):
+    global vc
     try:
-        return StreamingHttpResponse(gen(VideoCamera('web/deploy.prototxt', 'web/MobileNetSSD_deploy.caffemodel')),
-                                     content_type="multipart/x-mixed-replace;boundary=frame")
+        return StreamingHttpResponse(gen(vc),content_type="multipart/x-mixed-replace;boundary=frame")
     except HttpResponseServerError as e:
         print("aborted")
-
 
 def login(request):
     if request.method == 'POST':
