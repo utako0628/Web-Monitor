@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登陆</title>
+</head>
+<body>
+<h1>登陆</h1>
+<form class = 'form-login' action="login.html" method="post" enctype="multipart/form-data">
+    {% if message %}
+               <div class="alert alert-warning">{{ message }}</div>
+           {% endif %}
+    {% csrf_token %}
+    {{ f1 }}
+    <!--<input type="submit" value="登陆">-->
+    <button type="submit">登陆</button>
+</form>
+</body>
+</html>
