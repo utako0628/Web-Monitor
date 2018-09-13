@@ -23,4 +23,7 @@ urlpatterns = [
     path('index/login.html', views.login),
     path('index/changepassword.html', views.changepassword),
     path('index/show', views.show),
+    path('index/show/start', views.start, name='start'),
+    path('index/show/stop', views.stop, name='stop'),
+    path('index/show/stream', views.stream, name='stream')
 ]

@@ -1,10 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-<h1>显示画面</h1>
-</body>
+<html>
+    <head>
+        <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+        <meta name="viewport" content="width=device-width, minimum-scale=0.1">
+    </head>
+    <body style="margin: 0px;">
+        <h1> hello </h1>
+        <form id="start">
+            {% csrf_token %}
+            <input type="submit" value="Turn on camera">
+        </form>
+        <form id="stop">
+            {% csrf_token %}
+            <input type="submit" value="Turn off camera">
+        </form>
+        <img id="camera_view" style="-webkit-user-select: none;">
+    </body>
+
+    <script>
+        $('#camera_view').hide();
+        $('#start').submit(function(e){
+            e.preventDefault();
+            $.ajax({
+                url:"{% url 'start'%}",
+                type:'post',
+                data:$('#start').serialize(),
+                success: function(){
+                    $('#camera_view').show();
+                    $('#camera_view').attr('src',"{% url 'stream' %}");
+                }
+            });
+        });
+
+        $('#stop').submit(function(e){
+            e.preventDefault();
+            $.ajax({
+                url:"{% url 'stop'%}",
+                type:'post',
+                data:$('#stop').serialize(),
+                success: function(){
+                    $('#camera_view').hide();
+                    $('#camera_view').attr('src',"");
+                }
+            });
+        });
+    </script>
 </html>
+
